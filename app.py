@@ -1,10 +1,15 @@
 import requests
+import os
 from flask import Flask, render_template, request, jsonify
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
-# ✅ Hardcoded API Key (Ensure this is correct)
-API_KEY = "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"
+# ✅ Get API Key securely
+API_KEY = os.getenv("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")
 
 @app.route("/")
 def index():
