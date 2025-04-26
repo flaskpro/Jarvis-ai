@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
 # ✅ Hardcoded API Key (Ensure this is correct)
-API_KEY = "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"
+API_KEY = "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"
 
 @app.route("/")
 def index():
