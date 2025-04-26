@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jarvis AI</title>
+  <style>
+    :root {
+      --bg-color: #faf7f5;
+      --text-color: #333;
+      --user-bg: #ffe4c4;
+      --bot-bg: #ffffff;
+      --input-bg: #fff;
+      --button-bg: #3a8dff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+      padding: 20px;
+      font-weight: bold;
+      font-size: 22px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #chatContainer {
+      flex: 1;
+      width: 100%;
+      max-width: 700px;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 12px 15px;
+      border-radius: 15px;
+      font-size: 16px;
+      word-wrap: break-word;
+      margin: 8px;
+      position: relative;
+    }
+
+    .user { align-self: flex-end; text-align: right; background: var(--user-bg); }
+    .bot { align-self: flex-start; text-align: left; background: var(--bot-bg); }
+
+    /* Thinking Animation */
+    .thinking::after {
+      content: 'Jarvis is thinking';
+      animation: thinkingDots 1s steps(5, end) infinite;
+    }
+
+    @keyframes thinkingDots {
+      0%, 20% { content: 'Jarvis is thinking'; }
+      40% { content: 'Jarvis is thinking.'; }
+      60% { content: 'Jarvis is thinking..'; }
+      80% { content: 'Jarvis is thinking...'; }
+      100% { content: 'Jarvis is thinking'; }
+    }
+
+    form {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      background: var(--button-bg);
+      color: white;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>Jarvis AI</header>
+  <div id="chatContainer"></div>
+
+  <form id="chatForm">
+    <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+    <button type="submit">Send</button>
+    <button type="button" id="micBtn">🎤</button>
+    <button type="button" id="speakBtn">🔊</button>
+  </form>
+
+  <script>
+    const chatContainer = document.getElementById("chatContainer");
+    const chatForm = document.getElementById("chatForm");
+    const userInput = document.getElementById("userInput");
+    const micBtn = document.getElementById("micBtn");
+    const speakBtn = document.getElementById("speakBtn");
+
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      msgDiv.textContent = text;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function addThinkingAnimation() {
+      const thinkingMsg = document.createElement("div");
+      thinkingMsg.className = "message bot thinking";
+      chatContainer.appendChild(thinkingMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      return thinkingMsg;
+    }
+
+    function addTypingAnimation(responseText) {
+      const typingMsg = document.createElement("div");
+      typingMsg.className = "message bot typing";
+      chatContainer.appendChild(typingMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      let i = 0;
+      function typeLetter() {
+        if (i < responseText.length) {
+          typingMsg.textContent += responseText.charAt(i);
+          i++;
+          setTimeout(typeLetter, 35); // ✅ Faster typing speed
+        } else {
+          typingMsg.classList.remove("typing");
+        }
+      }
+
+      typeLetter();
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      userInput.value = "";
+
+      const thinkingMsg = addThinkingAnimation();
+
+      try {
+        const response = await fetch("/get-reply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_input: text })
+        });
+
+        const data = await response.json();
+        thinkingMsg.remove();
+        addTypingAnimation(data.reply);
+      } catch (error) {
+        thinkingMsg.remove();
+        addTypingAnimation("⚠️ Network error.");
+      }
+    });
+
+    // ✅ Speech Recognition Toggle (Stays On Until Manually Stopped)
+    let recognition;
+    let isListening = false;
+
+    micBtn.addEventListener("click", () => {
+      if (!isListening) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.continuous = true; // ✅ Keeps recognition active
+        recognition.start();
+        isListening = true;
+        micBtn.textContent = "🛑";
+
+        recognition.onresult = (event) => {
+          userInput.value = event.results[0][0].transcript;
+        };
+
+        recognition.onerror = () => {
+          alert('⚠️ Speech recognition error.');
+          recognition.stop();
+          isListening = false;
+          micBtn.textContent = "🎤";
+        };
+      } else {
+        recognition.stop();
+        isListening = false;
+        micBtn.textContent = "🎤";
+      }
+    });
+
+    // ✅ Speak Answer Button
+    speakBtn.addEventListener("click", () => {
+      const lastBotMessage = document.querySelector(".message.bot:last-child");
+      if (lastBotMessage) {
+        const speech = new SpeechSynthesisUtterance(lastBotMessage.textContent);
+        window.speechSynthesis.speak(speech);
+      }
+    });
+
+  </script>
+</body>
+</html>

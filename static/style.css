@@ -1,0 +1,133 @@
+:root {
+    --bg-light: #f4f7fc;
+    --bg-dark: #1e1e1e;
+    --text-light: #000;
+    --text-dark: #fff;
+    --user-msg-bg: #d1e7fd;
+    --bot-msg-bg: #d3f9e8;
+    --bot-msg-dark: #2a2a2a;
+    --user-msg-dark: #3a3a3a;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  body.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+  }
+
+  .chat-container {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  }
+  
+
+  body.dark-mode .chat-container {
+    background-color: #2c2c2c;
+  }
+
+  .chat-box {
+    background-color: #e7eff6;
+    border-radius: 10px;
+    padding: 15px;
+    overflow-y: auto;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  body.dark-mode .chat-box {
+    background-color: #222;
+  }
+
+  .user-msg, .bot-msg {
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 16px;
+  }
+
+  .user-msg {
+    background-color: var(--user-msg-bg);
+    align-self: flex-start;
+    margin-left: 10px;
+  }
+
+  .bot-msg {
+    background-color: var(--bot-msg-bg);
+    align-self: flex-end;
+    margin-right: 10px;
+  }
+
+  body.dark-mode .user-msg {
+    background-color: var(--user-msg-dark);
+  }
+
+  body.dark-mode .bot-msg {
+    background-color: var(--bot-msg-dark);
+    color: #fff;
+  }
+
+  form {
+    display: flex;
+    gap: 10px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: #3a8dff;
+  }
+
+  button {
+    padding: 12px 20px;
+    background-color: #3a8dff;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background-color: #006eff;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .toggle {
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 10px;
+  }
