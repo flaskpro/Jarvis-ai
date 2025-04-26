@@ -1,7 +1,7 @@
 import requests
 from flask import Flask, render_template, request, jsonify
 import os
-API_KEY = os.getenv("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")
+API_KEY = ("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")
 
 app = Flask(__name__)
 
