@@ -1,12 +1,10 @@
 import requests
 from flask import Flask, render_template, request, jsonify
-import os
-API_KEY = ("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")
 
 app = Flask(__name__)
 
-# ✅ Correct API Key
-
+# ✅ Hardcoded API Key (Ensure this is correct)
+API_KEY = "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"
 
 @app.route("/")
 def index():
@@ -31,7 +29,7 @@ def fetch_reply(user_input):
 
     try:
         headers = {
-            "Authorization": f"Bearer {API_KEY}",   # ✅ Correct use of variable
+            "Authorization": f"Bearer {API_KEY}",
             "Content-Type": "application/json"
         }
         data = {
@@ -40,7 +38,7 @@ def fetch_reply(user_input):
         }
 
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-        response.raise_for_status()
+        response.raise_for_status()  
 
         response_data = response.json()
         if "choices" in response_data and response_data["choices"]:
